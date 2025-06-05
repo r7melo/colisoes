@@ -78,9 +78,11 @@ int tamanho(TreeAVL *tree)
 
 int __inserir(Tno *no, int valor)
 {
+    
     if(valor < no->valor)
     {
-        printf(" %d<-%d", valor, no->valor);
+        printf(" %d<-%d  ", valor, no->valor);
+        
         
         if(no->esq == NULL)
         {
@@ -95,7 +97,7 @@ int __inserir(Tno *no, int valor)
     }
     else if(valor > no->valor)
     {
-        printf(" %d->%d", no->valor, valor);
+        printf(" %d[%d->%d]", no->pivo, no->valor, valor);
         
         if(no->dir == NULL)
         {
@@ -107,6 +109,7 @@ int __inserir(Tno *no, int valor)
         }
         no->dir_size++;
     }   
+
 
     return 0;
 }
