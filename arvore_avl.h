@@ -44,72 +44,20 @@ void __imprimir_nivel(int nivel)
 
 void __imprimir(Tno *no, int nivel) 
 {
-    if(no->dir != NULL)
-    {
+    __imprimir_nivel(nivel);
+    printf("%d(%d)%d>\n", no->esq_size, no->valor, no->dir_size);
 
-        __imprimir_nivel(nivel);
-        printf("(%d):%d>\n", no->dir->valor,no->pivo);
+    if(no->dir != NULL)
         __imprimir(no->dir, nivel+1); 
-    }
     
     if(no->esq != NULL) 
-    {
-        __imprimir_nivel(nivel);
-        printf("<%d:(%d)\n",  no->pivo, no->esq->valor);
         __imprimir(no->esq, nivel+1);
-    }
+    
 }
 
 void imprimir(TreeAVL *tree)
 {
-    printf("\n<%d:%d>\n", tree->raiz->valor, tree->raiz->pivo);
-    __imprimir(tree->raiz, 1);
-}
-
-int __inserir(Tno *no, int valor)
-{
-    int esq_size = 0;
-    int dir_size = 0;
-
-    if(valor < no->valor)
-    {
-        if(no->esq == NULL)
-        {
-            no->esq = ConstructNoAVL(valor);
-            no->esq_size = 1;
-        }
-        else
-        {
-            no->pivo = __inserir(no->esq, valor);
-        }
-    }
-
-    if(valor > no->valor)
-    {
-        if(no->dir == NULL)
-        {
-            no->dir = ConstructNoAVL(valor);
-            no->dir_size = 1;
-        }
-        else
-        {
-            no->pivo = __inserir(no->dir, valor);
-        }
-    }
-
-    return tamanho(no->esq) - tamanho(no->dir);        
-}
-
-void inserir(TreeAVL *tree, int valor) 
-{
-    if(tree->raiz == NULL)
-    {
-        tree->raiz = ConstructNoAVL(valor);
-    }
-    else
-    {
-        tree->raiz->pivo = __inserir(tree->raiz, valor);
-    }
+    __imprimir(tree->raiz, 0);
 }
 
 int __tamanho(Tno *no)
@@ -128,6 +76,54 @@ int tamanho(TreeAVL *tree)
     return __tamanho(tree->raiz) - 1;
 }
 
+int __inserir(Tno *no, int valor)
+{
+    if(valor < no->valor)
+    {
+        printf(" %d<-%d", valor, no->valor);
+        
+        if(no->esq == NULL)
+        {
+            no->esq = ConstructNoAVL(valor);
+        }
+        else
+        {
+            no->esq_size = __inserir(no->esq, valor);
+            
+        }    
+        no->esq_size ++;
+    }
+    else if(valor > no->valor)
+    {
+        printf(" %d->%d", no->valor, valor);
+        
+        if(no->dir == NULL)
+        {
+            no->dir = ConstructNoAVL(valor);    
+        }
+        else
+        {
+            __inserir(no->dir, valor);
+        }
+        no->dir_size++;
+    }   
+
+    return 0;
+}
+
+void inserir(TreeAVL *tree, int valor) 
+{
+    if(tree->raiz == NULL)
+    {
+        tree->raiz = ConstructNoAVL(valor);
+    }
+    else
+    {
+        tree->raiz->pivo = __inserir(tree->raiz, valor);
+    }
+}
+
+
 void __FreeTreeAVL(Tno *no)
 {
     if(no == NULL) return;
@@ -142,3 +138,5 @@ void FreeTreeAVL(TreeAVL *tree)
 {
     __FreeTreeAVL(tree->raiz);    
 }
+
+
