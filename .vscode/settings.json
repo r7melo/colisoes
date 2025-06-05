@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "arvore_avl.h": "c",
+        "stdio.h": "c"
+    }
+}
