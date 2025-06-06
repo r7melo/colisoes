@@ -6,7 +6,7 @@ int main()
 {
     TreeAVL *treeAVL = ConstructTreeAVL();
 
-    int vetor[] = {10, 20, 5, 8, 7};
+    int vetor[] = {10, 20, 5, 8, 12, 22, 23};
     int vetor_lenght = sizeof(vetor) / sizeof(int);
    
     for(int i=0; i<vetor_lenght; i++)

@@ -5,6 +5,7 @@ typedef struct no
 {
     int valor;
     int pivo;
+    int is_father;
     int esq_size;
     int dir_size;
     struct no *dir;
@@ -34,6 +35,7 @@ Tno *ConstructNoAVL(int valor)
     no->esq_size = 0;
     no->dir_size = 0;
     no->pivo = 0;
+    no->is_father = 0;
 }
 
 void __imprimir_nivel(int nivel)
@@ -81,33 +83,35 @@ int __inserir(Tno *no, int valor)
     
     if(valor < no->valor)
     {
-        printf(" %d<-%d  ", valor, no->valor);
-        
-        
         if(no->esq == NULL)
         {
             no->esq = ConstructNoAVL(valor);
+            no->is_father = 1;
         }
         else
         {
-            no->esq_size = __inserir(no->esq, valor);
-            
-        }    
-        no->esq_size ++;
+            __inserir(no->esq, valor);
+        }  
+        
+        printf("  %d[%d<-%d]  ", no->pivo, valor, no->valor);
+        no->esq_size++;
+        printf("E%d|D%d", no->esq_size, no->dir_size);
     }
     else if(valor > no->valor)
     {
-        printf(" %d[%d->%d]", no->pivo, no->valor, valor);
-        
         if(no->dir == NULL)
         {
             no->dir = ConstructNoAVL(valor);    
+            no->is_father = 1;
         }
         else
         {
             __inserir(no->dir, valor);
         }
+
+        printf("  %d[%d->%d]  ", no->pivo, no->valor, valor);
         no->dir_size++;
+        printf("E%d|D%d", no->esq_size, no->dir_size);
     }   
 
 
