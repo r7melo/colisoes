@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE 1
+#define FALSE 0
+
 typedef struct no 
 {
     int valor;
@@ -35,19 +38,19 @@ Tno *ConstructNoAVL(int valor)
     no->esq_size = 0;
     no->dir_size = 0;
     no->pivo = 0;
-    no->is_father = 0;
+    no->is_father = FALSE;
 }
 
 void __imprimir_nivel(int nivel)
 {
     for(int i=0; i<nivel; i++)
-        printf("    ");
+        printf("        ");
 }
 
 void __imprimir(Tno *no, int nivel) 
 {
     __imprimir_nivel(nivel);
-    printf("%d(%d)%d>\n", no->esq_size, no->valor, no->dir_size);
+    printf("%d(%d:%d)%d\n", no->esq_size, no->valor, no->pivo, no->dir_size);
 
     if(no->dir != NULL)
         __imprimir(no->dir, nivel+1); 
@@ -75,10 +78,13 @@ int __tamanho(Tno *no)
 
 int tamanho(TreeAVL *tree)
 {
-    return __tamanho(tree->raiz) - 1;
+    if(tree->raiz->esq_size > tree->raiz->dir_size)
+        return tree->raiz->esq_size;
+    else 
+        return tree->raiz->dir_size;
 }
 
-int __inserir(Tno *no, int valor)
+void __inserir(Tno *no, int valor)
 {
     
     if(valor < no->valor)
@@ -86,36 +92,29 @@ int __inserir(Tno *no, int valor)
         if(no->esq == NULL)
         {
             no->esq = ConstructNoAVL(valor);
-            no->is_father = 1;
+            no->esq_size++;
         }
         else
         {
             __inserir(no->esq, valor);
+            no->esq_size = __tamanho(no->esq) -1;
         }  
-        
-        printf("  %d[%d<-%d]  ", no->pivo, valor, no->valor);
-        no->esq_size++;
-        printf("E%d|D%d", no->esq_size, no->dir_size);
     }
     else if(valor > no->valor)
     {
         if(no->dir == NULL)
         {
-            no->dir = ConstructNoAVL(valor);    
-            no->is_father = 1;
+            no->dir = ConstructNoAVL(valor);
+            no->dir_size++;
         }
         else
         {
             __inserir(no->dir, valor);
+            no->dir_size = __tamanho(no->dir) -1;
         }
-
-        printf("  %d[%d->%d]  ", no->pivo, no->valor, valor);
-        no->dir_size++;
-        printf("E%d|D%d", no->esq_size, no->dir_size);
     }   
 
-
-    return 0;
+    no->pivo = no->esq_size - no->dir_size;
 }
 
 void inserir(TreeAVL *tree, int valor) 
@@ -126,7 +125,7 @@ void inserir(TreeAVL *tree, int valor)
     }
     else
     {
-        tree->raiz->pivo = __inserir(tree->raiz, valor);
+        __inserir(tree->raiz, valor);
     }
 }
 
