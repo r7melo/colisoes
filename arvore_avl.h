@@ -38,7 +38,8 @@ Tno *ConstructNoAVL(int valor)
     no->esq_size = 0;
     no->dir_size = 0;
     no->pivo = 0;
-    no->is_father = FALSE;
+
+    return no;
 }
 
 void __imprimir_nivel(int nivel)
@@ -84,6 +85,15 @@ int tamanho(TreeAVL *tree)
         return tree->raiz->dir_size;
 }
 
+void __RE(Tno *no)
+{   
+    // A:no -> B:aux -> C
+    Tno *aux = no->dir;
+    no->dir = aux->esq;
+    aux->esq = no;
+    no = aux;
+}
+
 void __inserir(Tno *no, int valor)
 {
     
@@ -115,6 +125,14 @@ void __inserir(Tno *no, int valor)
     }   
 
     no->pivo = no->esq_size - no->dir_size;
+
+    if(no->pivo <-1)
+    {
+        if(no->dir->pivo < 0)
+        {
+            __RE(no);
+        }
+    }
 }
 
 void inserir(TreeAVL *tree, int valor) 
