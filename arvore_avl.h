@@ -9,8 +9,8 @@ typedef struct no
     int valor;
     int pivo;
     int is_father;
-    int esq_size;
-    int dir_size;
+    int esq_alt;
+    int dir_alt;
     struct no *dir;
     struct no *esq;
 } Tno;
@@ -35,8 +35,8 @@ Tno *ConstructNoAVL(int valor)
     no->valor = valor;
     no->esq = NULL;
     no->dir = NULL;
-    no->esq_size = 0;
-    no->dir_size = 0;
+    no->esq_alt = 0;
+    no->dir_alt = 0;
     no->pivo = 0;
 
     return no;
@@ -51,7 +51,7 @@ void __imprimir_nivel(int nivel)
 void __imprimir(Tno *no, int nivel) 
 {
     __imprimir_nivel(nivel);
-    printf("%d(%d:%d)%d\n", no->esq_size, no->valor, no->pivo, no->dir_size);
+    printf("%d(%d:%d)%d\n", no->esq_alt, no->valor, no->pivo, no->dir_alt);
 
     if(no->dir != NULL)
         __imprimir(no->dir, nivel+1); 
@@ -66,73 +66,105 @@ void imprimir(TreeAVL *tree)
     __imprimir(tree->raiz, 0);
 }
 
-int __tamanho(Tno *no)
+int __altura(Tno *no)
 {
     if(no == NULL) return 1;
 
-    int esq = __tamanho(no->esq);
-    int dir = __tamanho(no->dir);
+    int esq = __altura(no->esq);
+    int dir = __altura(no->dir);
 
     if(esq > dir) return esq + 1;
     else return dir + 1;
 }
 
-int tamanho(TreeAVL *tree)
+int altura(TreeAVL *tree)
 {
-    if(tree->raiz->esq_size > tree->raiz->dir_size)
-        return tree->raiz->esq_size;
+    if(tree->raiz->esq_alt > tree->raiz->dir_alt)
+        return tree->raiz->esq_alt;
     else 
-        return tree->raiz->dir_size;
+        return tree->raiz->dir_alt;
 }
 
-void __RE(Tno *no)
+Tno *__RE(Tno *no)
 {   
     // A:no -> B:aux -> C
     Tno *aux = no->dir;
     no->dir = aux->esq;
     aux->esq = no;
-    no = aux;
+
+    no->esq_alt = __altura(no->esq) -1;
+    no->dir_alt = __altura(no->dir) -1;
+    no->pivo = no->esq_alt - no->dir_alt;
+
+    aux->esq_alt = __altura(aux->esq) -1;
+    aux->dir_alt = __altura(aux->dir) -1;
+    aux->pivo = aux->esq_alt - aux->dir_alt;
+
+    return aux; 
 }
 
-void __inserir(Tno *no, int valor)
+Tno* __RD(Tno* no)
 {
-    
+    Tno* aux = no->esq;
+    no->esq = aux->dir;
+    aux->dir = no;
+
+    no->esq_alt = __altura(no->esq) -1;
+    no->dir_alt = __altura(no->dir) -1;
+    no->pivo = no->esq_alt - no->dir_alt;
+
+    aux->esq_alt = __altura(aux->esq) -1;
+    aux->dir_alt = __altura(aux->dir) -1;
+    aux->pivo = aux->esq_alt - aux->dir_alt;
+
+    return aux;
+}
+
+
+Tno *__inserir(Tno *no, int valor)
+{
+    if (no == NULL)
+        return ConstructNoAVL(valor);
+
     if(valor < no->valor)
     {
-        if(no->esq == NULL)
-        {
-            no->esq = ConstructNoAVL(valor);
-            no->esq_size++;
-        }
-        else
-        {
-            __inserir(no->esq, valor);
-            no->esq_size = __tamanho(no->esq) -1;
-        }  
+        no->esq = __inserir(no->esq, valor);
     }
     else if(valor > no->valor)
     {
-        if(no->dir == NULL)
-        {
-            no->dir = ConstructNoAVL(valor);
-            no->dir_size++;
-        }
-        else
-        {
-            __inserir(no->dir, valor);
-            no->dir_size = __tamanho(no->dir) -1;
-        }
+        no->dir = __inserir(no->dir, valor);
     }   
 
-    no->pivo = no->esq_size - no->dir_size;
+    no->esq_alt = __altura(no->esq) -1;
+    no->dir_alt = __altura(no->dir) -1 ;
+    no->pivo = no->esq_alt - no->dir_alt;
 
     if(no->pivo <-1)
     {
-        if(no->dir->pivo < 0)
+        if(no->dir && no->dir->pivo < 0)
         {
-            __RE(no);
+            no = __RE(no);
+        }
+        else if(no->dir)
+        {
+            no->dir = __RD(no->dir);
+            return __RE(no);
         }
     }
+    else if(no->pivo > 1)
+    {
+        if(no->esq && no->esq->pivo > 0)
+        {
+            return __RD(no);
+        }
+        else if(no->esq)
+        {
+            no->esq = __RE(no->esq);
+            return __RD(no);
+        }
+    }
+
+    return no;  
 }
 
 void inserir(TreeAVL *tree, int valor) 
@@ -143,7 +175,7 @@ void inserir(TreeAVL *tree, int valor)
     }
     else
     {
-        __inserir(tree->raiz, valor);
+       tree->raiz = __inserir(tree->raiz, valor);
     }
 }
 

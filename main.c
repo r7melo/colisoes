@@ -6,7 +6,7 @@ int main()
 {
     TreeAVL *treeAVL = ConstructTreeAVL();
 
-    int vetor[] = {10, 20, 5, 8, 12, 22, 23, 25};
+    int vetor[] = {15, 30, 10, 40, 50, 25};
     int vetor_lenght = sizeof(vetor) / sizeof(int);
    
     for(int i=0; i<vetor_lenght; i++)
@@ -17,7 +17,7 @@ int main()
     imprimir(treeAVL);
 
 
-    printf("TAMANHO:%d", tamanho(treeAVL));
+    printf("ALTURA:%d", altura(treeAVL));
 
     FreeTreeAVL(treeAVL);
 
